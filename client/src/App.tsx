@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
-import qs from 'qs';
 import { ApiData, Email } from './types';
 import { useHttp } from './hooks/http.hook';
+import { formatter, toQueryString } from './utils';
 
 let controller: AbortController | null = null;
 const API_URL = process.env.REACT_APP_API_URL;
@@ -26,14 +26,11 @@ const App = () => {
       [e.target.name]: e.target.value
     }
 
+    query.number = query.number.replaceAll('-', '');
+
     setForm(query);
 
-    const queryString = qs.stringify(query, {
-      skipNulls: true,
-      filter: (_, value) => value || undefined
-    });
-
-    const data = await request(`${ API_URL }/emails?${ queryString }`, { signal });
+    const data = await request(`${ API_URL }/emails?${ toQueryString(query) }`, { signal });
     if (data) setData(data);
 
     controller = null;
@@ -47,12 +44,12 @@ const App = () => {
         </span>
 
         <div className="input-container">
-          <input type="text" name="email" placeholder="email" value={ form.email || '' } onChange={ onFormChange }/>
+          <input type="text" name="email" placeholder="email" value={ form.email } onChange={ onFormChange }/>
           { data?.errors?.email && <span className="validation-message">{ data.errors.email.msg }</span> }
         </div>
 
         <div className="input-container">
-          <input type="text" name="number" placeholder="number" value={ form.number || '' } onChange={ onFormChange }/>
+          <input type="text" name="number" placeholder="number" value={ formatter(form.number) } onChange={ onFormChange }/>
           { data?.errors?.number && <span className="validation-message">{ data.errors.number.msg }</span> }
         </div>
       </div>

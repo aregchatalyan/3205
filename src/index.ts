@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((_req: Request, res: Response, next: NextFunction) => {
   res.success = (status, data, message) => {
     return res.status(status).json({ message, data });
   }
@@ -25,7 +25,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use('/api/v1/emails', router);
 
-app.use((err: Error | ApiError, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error | ApiError, _req: Request, res: Response, _next: NextFunction) => {
   if (err && err instanceof ApiError) return res.failed(err.status, err.message, err.errors);
 
   console.log(err.message);
