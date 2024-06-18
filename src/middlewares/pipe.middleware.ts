@@ -3,7 +3,7 @@ import { checkSchema, Schema, validationResult } from 'express-validator';
 import { ApiError } from '../api/api.error';
 
 export const pipeMiddleWare = (schema: Schema) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     await checkSchema(schema).run(req);
 
     const errors = validationResult(req);

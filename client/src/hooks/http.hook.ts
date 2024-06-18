@@ -1,16 +1,5 @@
 import { useState, useCallback } from 'react';
-
-export interface ValidationError {
-  msg: string;
-  path: string;
-  value: string;
-}
-
-export interface ApiData {
-  message?: string;
-  data?: any;
-  errors?: Record<'email' | 'number', ValidationError>;
-}
+import { ApiData } from '../types';
 
 export const useHttp = () => {
   const [ loading, setLoading ] = useState<boolean>(false);
@@ -21,8 +10,8 @@ export const useHttp = () => {
     if (init.body) {
       init.body = JSON.stringify(init.body);
       init.headers = {
-        ...init.headers,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...init.headers
       }
     }
 

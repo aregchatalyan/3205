@@ -4,7 +4,6 @@ dotenv.config();
 
 interface Environment {
   PORT: string;
-  HOST: string;
 }
 
 class Config {

@@ -1,45 +1,39 @@
 import React, { ChangeEvent, useState } from 'react';
 import qs from 'qs';
-import { ApiData, useHttp, ValidationError } from './hooks/http.hook';
+import { ApiData, Email } from './types';
+import { useHttp } from './hooks/http.hook';
 
-interface Email {
-  email: string | undefined;
-  number: string | undefined;
-}
-
-interface Data extends ApiData {
-  message?: string;
-  data?: Email[],
-  errors?: {
-    email: ValidationError;
-    number: ValidationError;
-  }
-}
-
-const API_URL = process.env.REACT_APP_API_URL;
 let controller: AbortController | null = null;
+const API_URL = process.env.REACT_APP_API_URL;
 
 const App = () => {
-  const [ data, setData ] = useState<Data | null>(null);
-  const [ form, setForm ] = useState<Email>({
-    email: undefined,
-    number: undefined
-  });
-
   const { request, loading } = useHttp();
 
+  const [ data, setData ] = useState<ApiData | null>(null);
+  const [ form, setForm ] = useState<Email>({
+    email: '',
+    number: ''
+  });
+
   const onFormChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (controller) {
-      controller.abort();
-    }
+    if (controller) controller.abort();
 
     controller = new AbortController();
     const signal = controller.signal;
 
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const query = {
+      ...form,
+      [e.target.name]: e.target.value
+    }
 
-    const query = qs.stringify({ ...form, [e.target.name]: e.target.value });
-    const data = await request(`${ API_URL }/emails?${ query }`, { signal });
+    setForm(query);
+
+    const queryString = qs.stringify(query, {
+      skipNulls: true,
+      filter: (_, value) => value || undefined
+    });
+
+    const data = await request(`${ API_URL }/emails?${ queryString }`, { signal });
     if (data) setData(data);
 
     controller = null;
